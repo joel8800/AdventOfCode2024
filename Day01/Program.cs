@@ -1,9 +1,9 @@
 ﻿
-Console.WriteLine("Day 01: ");
+Console.WriteLine("Day 01: Historian Hysteria");
 
 string[] input = File.ReadAllLines("input.txt");
 
-int total = 0;
+int totalPt1 = 0;
 List<int> left = [];
 List<int> right = [];
 
@@ -18,25 +18,20 @@ left.Sort();
 right.Sort();
 
 for (int i = 0; i < left.Count; i++)
-{
-    int l = left[i];
-    int r = right[i];
+    totalPt1 += Math.Abs(right[i] - left[i]);
 
-    Console.WriteLine($"{l} - {r} = {r - l}");
-    total += Math.Abs(r - l);
-}
+// ----------------------------------------------------------------------------
 
-int score = 0;
+int scorePt2 = 0;
 
 for (int i = 0; i < left.Count; i++)
 {
-    int l = left[i];
-    int appearances = right.Where(x => x == l).Count();
+    int appearances = right.Where(x => x == left[i]).Count();
 
-    Console.WriteLine($"{l} appears {appearances} times");
-    score += l * appearances;
+    scorePt2 += left[i] * appearances;
 }
 
+Console.WriteLine($"Part 1: {totalPt1}"); // 2756096
+Console.WriteLine($"Part 2: {scorePt2}"); // 23117829
 
-Console.WriteLine($"Part 1: {total}");
-Console.WriteLine($"Part 2: {score}");
+// ============================================================================
