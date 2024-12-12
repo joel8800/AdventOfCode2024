@@ -7,8 +7,8 @@ string[] blocks = allInput.Split(nl2x);
 string[] ruleLines = blocks[0].Split(nl, StringSplitOptions.RemoveEmptyEntries);
 string[] updateLines = blocks[1].Split(nl, StringSplitOptions.RemoveEmptyEntries);
 
-int answerPt1 = 0;
-int answerPt2 = 0;
+int answerPt1;
+int answerPt2;
 
 List<(int, int)> rules = [];
 List<List<int>> updates = [];
@@ -29,9 +29,7 @@ foreach (string updateLine in updateLines)
     List<int> pages = [];
     string[] parts = updateLine.Split(",");
     foreach (string part in parts)
-    {
         pages.Add(int.Parse(part));
-    }
     updates.Add(pages);
 }
 
@@ -49,9 +47,7 @@ foreach (List<int> pages in updates)
     }
 
     if (correct)
-    {
         goodMedians.Add(GetMedian(pages));   
-    }
     else
         badUpdates.Add(pages);
 }
@@ -90,7 +86,6 @@ foreach (List<int> pages in badUpdates)
 }
 
 answerPt2 = badMedians.Sum();
-
 
 Console.WriteLine($"Part 1: {answerPt1}");
 Console.WriteLine($"Part 2: {answerPt2}");
