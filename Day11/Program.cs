@@ -7,38 +7,45 @@ List<long> stones = [];
 foreach (string s in nums)
     stones.Add(long.Parse(s));
 
-Console.WriteLine(string.Join(" ", stones));
-
-int maxBlinks = 25; // does not scale to part 2
-for (int blink = 0; blink < maxBlinks; blink++)
+int blinksPt1 = 25;     // this method does not scale to part 2
+long stoneCount = 0;
+foreach (long stone in stones)
 {
-    int i = 0;
-    while (i < stones.Count)
+    List<long> newStones = [stone];
+    for (int blink = 0; blink < blinksPt1; blink++)
     {
-        if (stones[i] == 0)
-            stones[i] = 1;
-        else if (stones[i].ToString().Length % 2 == 0)
+        List<long> tmpStones = [];
+        foreach (long s in newStones)
         {
-            (long l, long r) = SplitNumber(stones[i]);
-            stones.RemoveAt(i);
-            stones.Insert(i, r);
-            stones.Insert(i, l);
-            i++;
+            if (s == 0)
+                tmpStones.Add(1);
+            else if (s.ToString().Length % 2 == 0)
+            {
+                (long l, long r) = SplitNumber(s);
+                tmpStones.Add(l);
+                tmpStones.Add(r);
+            }
+            else
+                tmpStones.Add(s * 2024);
         }
-        else
-            stones[i] *= 2024;
-
-        i++;
+        newStones = tmpStones;
     }
+    
+    stoneCount += newStones.Count;
 }
 
-int answerPt1 = stones.Count;
+long answerPt1 = stoneCount;
 Console.WriteLine($"Part 1: {answerPt1}");
 
 // ----------------------------------------------------------------------------
 
-int answerPt2 = 0;
+int blinksPt2 = 75;
+long totalStones = 0;
+Dictionary<(long, int), long> cache = [];
+foreach (long stone in stones)
+    totalStones += CountStones(stone, blinksPt2);
 
+long answerPt2 = totalStones;
 Console.WriteLine($"Part 2: {answerPt2}");
 
 // ============================================================================
@@ -46,14 +53,54 @@ Console.WriteLine($"Part 2: {answerPt2}");
 (long, long) SplitNumber(long num)
 {
     string numStr = num.ToString();
-    if (numStr.Length == 0 || numStr.Length % 2 != 0)
-    {
-        Console.WriteLine("Error: number not even length: " + numStr);
-    }
 
     int mid = numStr.Length / 2;
-    long left = Convert.ToInt64(numStr.Substring(0, mid));
-    long right = Convert.ToInt64(numStr.Substring(mid));
+    long left = Convert.ToInt64(numStr[..mid]);
+    long right = Convert.ToInt64(numStr[mid..]);
 
     return (left, right);
+}
+
+long CountStones(long stone, int blinks)
+{
+    if (blinks == 0)
+        return 1;
+
+    if (stone == 0)
+    {
+        if (cache.ContainsKey((1, blinks - 1)))
+            return cache[(1, blinks - 1)];
+        else
+            return CountStones(1, blinks - 1);
+    }
+
+    if (stone.ToString().Length % 2 == 0)
+    {
+        long left;
+        long right;
+        (long l, long r) = SplitNumber(stone);
+
+        if (cache.ContainsKey((l, blinks - 1)))
+            left = cache[(l, blinks - 1)];
+        else
+        {
+            left = CountStones(l, blinks - 1);
+            cache.Add((l, blinks - 1), left);
+        }
+
+        if (cache.ContainsKey((r, blinks - 1)))
+            right = cache[(r, blinks - 1)];
+        else
+        {
+            right = CountStones(r, blinks - 1);
+            cache.Add((r, blinks - 1), right);
+        }
+        
+        return left + right;
+    }
+
+    if (cache.ContainsKey((stone * 2024, blinks - 1)))
+        return cache[(stone * 2024, blinks - 1)];
+    else
+        return CountStones(stone * 2024, blinks - 1);
 }
